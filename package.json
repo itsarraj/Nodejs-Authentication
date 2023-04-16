@@ -1,0 +1,22 @@
+{
+    "name": "nodejs-authentication",
+    "version": "1.0.0",
+    "description": "complete authentication system for creating new application",
+    "main": "index.js",
+    "scripts": {
+        "test": "nodemon start"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/itsarraj/Nodejs-Authentication.git"
+    },
+    "keywords": [
+        "nodejs-authentication"
+    ],
+    "author": "itsarraj",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/itsarraj/Nodejs-Authentication/issues"
+    },
+    "homepage": "https://github.com/itsarraj/Nodejs-Authentication#readme"
+}
