@@ -1,0 +1,20 @@
+html body {
+  margin: 0px;
+  padding: 0px; }
+
+.footbar {
+  height: 25px;
+  background-color: #131313;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  display: flexbox;
+  align-items: center; }
+  .footbar .footname {
+    flex-direction: row; }
+  .footbar span a {
+    color: #ffffff;
+    font-size: 20px;
+    text-decoration: none;
+    padding: 0px 5px; }

@@ -1,0 +1,20 @@
+html body {
+  margin: 0px;
+  padding: 0px; }
+
+.navbar {
+  height: 45px;
+  background-color: #0065c4;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  display: flexbox;
+  align-items: center; }
+  .navbar .sitename {
+    flex-direction: row; }
+  .navbar span a {
+    color: #ffffff;
+    font-size: 30px;
+    text-decoration: none;
+    padding: 0px 5px; }

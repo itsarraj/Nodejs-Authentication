@@ -1,0 +1,19 @@
+<header>
+    <div class="nav navbar">
+        <span class="sitename">
+            <a href="/">SocialMash</a>
+        </span>
+        <span class="sign">
+            <a href=""> <% if (locals.user) {%> <%= user.name %></a>
+            <a href="/users/sign-out">Sign-Out</a>
+
+            <% } else {%>
+
+            <a href="/users/sign-in">Sign-in</a>
+
+            <a href="/users/sign-up">Sign-up</a>
+
+            <% }%>
+        </span>
+    </div>
+</header>

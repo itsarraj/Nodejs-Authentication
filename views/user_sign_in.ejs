@@ -1,0 +1,39 @@
+<link rel="stylesheet" type="text/css" href="/css/signin.css" />
+
+
+<div class="body">
+    <div class="container">
+        <form id="form" action="/users/create-session" method="POST" class="form">
+            <h2>Sign In</h2>
+
+            <div class="form-control">
+                <label for="email">Email</label>
+                <input type="text" id="email" name="email" placeholder="Enter email" />
+                <small>Error message</small>
+            </div>
+            <div class="form-control">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" placeholder="Enter password" />
+                <small>Error message</small>
+            </div>
+
+            <input type="submit" value="Sign In" class="button-design" />
+        </form>
+
+        <div class="form-control">
+            <a href="/password/forget-password">
+                <span class="forget-password"> Forget Password </span>
+            </a>
+        </div>
+
+        <div class="form">
+            <div class="form-control">
+                <label for="Google Sign In / Sign Up">Google Sign In / Sign Up</label>
+                <a href="/users/auth/google">
+                    <button type="button" value="Google Sign In / Sign Up" class="button-design button-design-google">
+                        Google Sign In / Sign Up</button>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
