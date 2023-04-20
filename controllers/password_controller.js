@@ -18,7 +18,6 @@ module.exports.sendResetLink = async function (req, res) {
     let user = await User.findOne({
         email: `${req.body.email}`,
     });
-
     if (!user) {
         // TODO Flash Invalid Email
         console.log('User not found');
@@ -33,6 +32,7 @@ module.exports.sendResetLink = async function (req, res) {
     const token = jwt.sign(payload, secret, { expiresIn: '15m' });
     const resetLink = `http://localhost:${env.port}/password/reset-password/${user.id}/${token}`;
     console.log(resetLink);
+    res.send('password reset mail sent successfully');
     // user.resetLink = resetLink;
     // forgetPasswordMailer.newResetPassword(user);
 
@@ -63,41 +63,87 @@ module.exports.sendResetLink = async function (req, res) {
 
 module.exports.resetpassword = async function (req, res) {
     const { id, token } = req.params;
-    res.send(req.params);
-    // let tokenExist = await User.findOne({
-    //     resettoken: token,
-    // });
-
-    // if (!tokenExist || tokenExist.resettokenexpirationDate < Date.now()) {
-    //     console.log('resetpassword tokenExist inside if ', tokenExist);
-
-    //     return res.status(400).send('Invalid or expired reset token');
-    // }
-    // return res.redirect('/password/reset-password');
-};
-
-module.exports.resetPasswordPage = async function (req, res) {
-    return res.render('reset_password', {
-        title: 'reset-password',
+    // checking for valid user in db
+    let user = await User.findOne({
+        _id: id,
     });
-};
-module.exports.postNewPassword = async function (req, res) {
-    const token = jwt.verify(token, env.JWT_SECRET);
 
-    let tokenExist = await User.findOne({
-        resettoken: token,
-    });
-    if (!tokenExist) {
+    if (id !== user.id) {
+        res.send('invalid_user');
+    }
+
+    // we have a valid id and we have a valid user with this id already
+    const secret = env.JWT_SECRET + user.password;
+    try {
+        const payload = jwt.verify(token, secret);
+        res.render('reset_password', {
+            title: 'reset-password',
+        });
+    } catch (error) {
+        // todo flash error
+        console.log(error);
+        // res.send(error);
         return res.redirect('/');
     }
-    let user = await User.updateOne(
-        {
-            email: req.body.email,
-        },
-        { password: req.body.password }
-    );
-    console.log('updated user ', user);
-    return res.redirect('back');
 };
 
-// middleware
+module.exports.postNewPassword = async function (req, res) {
+    const { id, token } = req.params;
+
+    const { password, password2 } = req.body;
+
+    let user = await User.findOne({
+        _id: id,
+    });
+
+    if (id !== user.id) {
+        res.send('invalid_user');
+    }
+
+    const secret = env.JWT_SECRET + user.password;
+    try {
+        const payload = await jwt.verify(token, secret);
+        if (password !== password2) {
+            return res.redirect('back');
+        }
+        // user.password = password;
+        user.password = password;
+        await user.save();
+        return res.redirect('/');
+    } catch (error) {
+        console.log(error);
+        // res.send(error);
+        // todo flash error
+        return res.redirect('/');
+    }
+};
+
+module.exports.resetSigninpassword = async function (req, res) {
+    return res.render('reset-signin-password', {
+        title: 'reset-signin-password',
+    });
+};
+
+module.exports.resetSigninpasswordChange = async function (req, res) {
+    const { password, password2 } = req.body;
+
+    let user = await User.findOne({
+        _id: req.user._id,
+    });
+
+    try {
+        if (password !== password2) {
+            //todo flash password & confirm password wrong
+            return res.redirect('back');
+        }
+        user.password = password;
+        await user.save();
+        return res.redirect('back');
+    } catch (error) {
+        console.log(error);
+        // todo: flash
+        return res.redirect('/');
+
+        // res.send(error);
+    }
+};
