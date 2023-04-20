@@ -4,6 +4,7 @@ const nodeMailer = require('../config/nodemailer');
 // Exporting a function named 'newResetPassword' as part of the module
 exports.newResetPassword = (user) => {
     // Generating an HTML string for the email body by rendering an EJS template
+
     let htmlString = nodeMailer.renderTemplate(
         { user: user },
         '/forget_password/forget_password.ejs'
@@ -18,8 +19,8 @@ exports.newResetPassword = (user) => {
             from: 'competitivedevelopernewsletter@gmail.com',
             to: user.email,
             subject: 'Reset Your Password',
-            html: htmlString,
             text: `Click the following link to reset your password: ${user.resetLink}`,
+            html: htmlString,
         },
         (err, info) => {
             if (err) {

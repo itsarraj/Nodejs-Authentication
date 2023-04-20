@@ -6,12 +6,12 @@ let transporter = nodemailer.createTransport(env.smtp);
 
 let renderTemplate = (data, relativePath) => {
     let mailHTML;
-    console.log(data);
     ejs.renderFile(
         path.join(__dirname, '../views/mailers', relativePath),
-
+        data,
         function (err, html) {
             if (err) {
+                console.log('this is html error', err);
                 console.error(err);
             }
             mailHTML = html;

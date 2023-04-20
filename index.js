@@ -1,5 +1,7 @@
 const express = require('express');
 const app = express();
+result = require('dotenv').config();
+
 const env = require('./config/environment');
 const session = require('express-session');
 const mongoose = require('mongoose');

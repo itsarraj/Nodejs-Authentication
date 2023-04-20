@@ -4,6 +4,8 @@ const path = require('path');
 const nodeMailer = require('../config/nodemailer.js');
 const forgetPasswordMailer = require('../mailers/forget_password_mailer.js');
 const crypto = require('crypto');
+const env = require('../config/environment.js');
+const jwt = require('jsonwebtoken');
 
 // GET request to render forget password page
 module.exports.forgotPasswordPage = function (req, res) {
@@ -18,24 +20,23 @@ module.exports.sendResetLink = async function (req, res) {
     });
 
     if (!user) {
-        // TODO: Flash Invalid Email
+        // TODO Flash Invalid Email
         console.log('User not found');
         return res.redirect('back');
     }
 
-    const token = crypto.randomBytes(20).toString('hex');
-    const expirationDate = Date.now() + 24 * 60 * 60 * 1000; // 24 hours from now
+    const secret = env.JWT_SECRET + user.password;
+    const payload = {
+        email: user.email,
+        id: user.id,
+    };
+    const token = jwt.sign(payload, secret, { expiresIn: '15m' });
+    const resetLink = `http://localhost:${env.port}/password/reset-password/${user.id}/${token}`;
+    console.log(resetLink);
+    // user.resetLink = resetLink;
+    // forgetPasswordMailer.newResetPassword(user);
 
-    // Store the reset token in the database
-    // TODO create db code
-    //
-    const resetLink = `http://localhost:${env.port}/password/reset-password?token=${token}`;
-    user.resetLink = resetLink;
-    forgetPasswordMailer.newResetPassword(user);
-    return res.redirect('back');
-    //
-
-    // commentsMailer.newComment(user);
+    // return res.redirect('back');
 
     //     The default priority map is as follows:
 
@@ -61,18 +62,18 @@ module.exports.sendResetLink = async function (req, res) {
 };
 
 module.exports.resetpassword = async function (req, res) {
-    const token = req.query.token;
+    const { id, token } = req.params;
+    res.send(req.params);
+    // let tokenExist = await User.findOne({
+    //     resettoken: token,
+    // });
 
-    let tokenExist = await User.findOne({
-        resettoken: token,
-    });
+    // if (!tokenExist || tokenExist.resettokenexpirationDate < Date.now()) {
+    //     console.log('resetpassword tokenExist inside if ', tokenExist);
 
-    if (!tokenExist || tokenExist.resettokenexpirationDate < Date.now()) {
-        return res.status(400).send('Invalid or expired reset token');
-    }
-    return res.render('reset_password', {
-        title: 'reset-password',
-    });
+    //     return res.status(400).send('Invalid or expired reset token');
+    // }
+    // return res.redirect('/password/reset-password');
 };
 
 module.exports.resetPasswordPage = async function (req, res) {
@@ -81,6 +82,14 @@ module.exports.resetPasswordPage = async function (req, res) {
     });
 };
 module.exports.postNewPassword = async function (req, res) {
+    const token = jwt.verify(token, env.JWT_SECRET);
+
+    let tokenExist = await User.findOne({
+        resettoken: token,
+    });
+    if (!tokenExist) {
+        return res.redirect('/');
+    }
     let user = await User.updateOne(
         {
             email: req.body.email,
@@ -90,3 +99,5 @@ module.exports.postNewPassword = async function (req, res) {
     console.log('updated user ', user);
     return res.redirect('back');
 };
+
+// middleware
