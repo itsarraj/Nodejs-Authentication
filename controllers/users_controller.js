@@ -31,8 +31,7 @@ module.exports.createAccount = async function (req, res) {
         let user = await User.findOne({ email: req.body.email });
 
         if (req.body.password != req.body.confirm_password) {
-            // TODO: Flash "Password & Confirm Password Does Not Match"
-            console.log('wrong password and confirm password');
+            req.flash('error', 'password & confirm password mismatch');
             return res.redirect('back');
         }
 
@@ -43,24 +42,20 @@ module.exports.createAccount = async function (req, res) {
                 name: req.body.name,
             });
 
-            // TODO: Flash "User Created"
-            console.log('user created');
+            req.flash('success', 'User Created Successfully');
             return res.redirect('/users/sign-in');
         } else {
-            // TODO: Flash "User Already Exists"
-            console.log('user exists');
-
+            req.flash('success', 'User Exists');
             return res.redirect('back');
         }
     } catch (error) {
-        console.log('Error to fecting sigining up page', error);
         return res.redirect('back');
     }
 };
 
 // sign in and create a session for the user
 module.exports.createSession = function (req, res) {
-    // TODO: Flash "CREATED SESSION"
+    req.flash('success', 'Login successful');
     return res.redirect('/');
 };
 
@@ -70,7 +65,7 @@ module.exports.destroySession = function (req, res) {
         if (err) {
             return res.redirect('back');
         } else {
-            // TODO: Flash "User Log Out"
+            req.flash('success', 'Logout successful');
             return res.redirect('/');
         }
     });

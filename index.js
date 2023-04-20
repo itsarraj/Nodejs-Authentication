@@ -21,6 +21,7 @@ const MongoStore = require('connect-mongo');
 
 const flash = require('connect-flash');
 const path = require('path');
+const customMiddleware = require('./config/middleware');
 
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -59,6 +60,7 @@ app.use(passport.session());
 
 app.use(passport.setAuthenticatedUser);
 app.use(flash());
+app.use(customMiddleware.setFlash);
 
 app.use('/', require('./routes/index'));
 

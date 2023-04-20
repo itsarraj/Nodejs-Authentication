@@ -19,8 +19,7 @@ module.exports.sendResetLink = async function (req, res) {
         email: `${req.body.email}`,
     });
     if (!user) {
-        // TODO Flash Invalid Email
-        console.log('User not found');
+        req.flash('error', 'User Does Not Exist');
         return res.redirect('back');
     }
 
@@ -32,64 +31,47 @@ module.exports.sendResetLink = async function (req, res) {
     const token = jwt.sign(payload, secret, { expiresIn: '15m' });
     const resetLink = `http://localhost:${env.port}/password/reset-password/${user.id}/${token}`;
     console.log(resetLink);
-    res.send('password reset mail sent successfully');
-    // user.resetLink = resetLink;
-    // forgetPasswordMailer.newResetPassword(user);
+    req.flash(
+        'success',
+        'Email sent - reset password link expires in 15 minutes'
+    );
 
-    // return res.redirect('back');
-
-    //     The default priority map is as follows:
-
-    // {
-    //     low: 10
-    //   , normal: 0
-    //   , medium: -5
-    //   , high: -10
-    //   , critical: -15
-    // };
-
-    // let job = queue.create('pass-reset-mail', user).save(function (err) {
-    //     if (err) {
-    //         console.log('Error in sending to the queue', err);
-    //         return;
-    //     }
-    //     // console.log('user ', user);
-    //     console.log('job enqueued', job.id);
-    // });
-    // return res.redirect('back');
-
-    // return res.redirect('/users/sign-in');
+    return res.redirect('back');
 };
 
 module.exports.resetpassword = async function (req, res) {
-    const { id, token } = req.params;
-    // checking for valid user in db
-    let user = await User.findOne({
-        _id: id,
-    });
-
-    if (id !== user.id) {
-        res.send('invalid_user');
-    }
-
-    // we have a valid id and we have a valid user with this id already
-    const secret = env.JWT_SECRET + user.password;
     try {
-        const payload = jwt.verify(token, secret);
-        res.render('reset_password', {
-            title: 'reset-password',
+        const { id, token } = req.params;
+        // checking for valid user in db
+        let user = await User.findOne({
+            _id: id,
         });
+
+        if (id !== user.id) {
+            req.flash('error', 'Exipred/Invalid Token');
+        }
+
+        // we have a valid id and we have a valid user with this id already
+        const secret = env.JWT_SECRET + user.password;
+        try {
+            const payload = jwt.verify(token, secret);
+            req.flash('success', 'Token Verified | Change Password');
+
+            res.render('reset_password', {
+                title: 'reset-password',
+            });
+        } catch (error) {
+            // todo flash error
+            req.flash('error', 'Exipred/Invalid Token');
+            return res.redirect('/password/forgot-password');
+        }
     } catch (error) {
-        // todo flash error
-        console.log(error);
-        // res.send(error);
         return res.redirect('/');
     }
 };
 
 module.exports.postNewPassword = async function (req, res) {
     const { id, token } = req.params;
-
     const { password, password2 } = req.body;
 
     let user = await User.findOne({
@@ -97,23 +79,23 @@ module.exports.postNewPassword = async function (req, res) {
     });
 
     if (id !== user.id) {
-        res.send('invalid_user');
+        req.flash('error', 'Exipred/Invalid Token');
     }
 
     const secret = env.JWT_SECRET + user.password;
     try {
         const payload = await jwt.verify(token, secret);
         if (password !== password2) {
+            req.flash('error', 'password & confirm password mismatch');
+
             return res.redirect('back');
         }
-        // user.password = password;
         user.password = password;
         await user.save();
+        req.flash('success', 'Passwords are Changed ');
+
         return res.redirect('/');
     } catch (error) {
-        console.log(error);
-        // res.send(error);
-        // todo flash error
         return res.redirect('/');
     }
 };
@@ -125,25 +107,26 @@ module.exports.resetSigninpassword = async function (req, res) {
 };
 
 module.exports.resetSigninpasswordChange = async function (req, res) {
-    const { password, password2 } = req.body;
-
-    let user = await User.findOne({
-        _id: req.user._id,
-    });
-
     try {
-        if (password !== password2) {
-            //todo flash password & confirm password wrong
-            return res.redirect('back');
-        }
-        user.password = password;
-        await user.save();
-        return res.redirect('back');
-    } catch (error) {
-        console.log(error);
-        // todo: flash
-        return res.redirect('/');
+        const { password, password2 } = req.body;
 
-        // res.send(error);
+        let user = await User.findOne({
+            _id: req.user._id,
+        });
+
+        try {
+            if (password !== password2) {
+                req.flash('error', 'password & confirm password mismatch');
+                return res.redirect('back');
+            }
+            user.password = password;
+            await user.save();
+            req.flash('success', 'Passwords are Changed ');
+            return res.redirect('back');
+        } catch (error) {
+            return res.redirect('/');
+        }
+    } catch (error) {
+        return res.redirect('/');
     }
 };
