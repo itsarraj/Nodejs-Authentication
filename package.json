@@ -4,8 +4,8 @@
     "description": "complete authentication system for creating new application",
     "main": "index.js",
     "scripts": {
-        "start": "nodemon index.js",
-        "prod_start": "NODE_ENV=production nodemon index.js"
+        "start": "node index.js",
+        "deployed_start": "pm2 start index.js"
     },
     "repository": {
         "type": "git",
