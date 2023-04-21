@@ -15,6 +15,7 @@ router.post('/create-account', usersController.createAccount);
 router.get('/sign-in', usersController.signin);
 router.post(
     '/create-session',
+    usersController.flashmiddleware,
     passport.authenticate('local', {
         failureRedirect: '/users/sign-in',
     }),

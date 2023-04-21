@@ -19,7 +19,7 @@ module.exports.sendResetLink = async function (req, res) {
         email: `${req.body.email}`,
     });
     if (!user) {
-        req.flash('error', 'User Does Not Exist');
+        req.flash('error', 'No User Associated with This Email');
         return res.redirect('back');
     }
 
@@ -31,6 +31,8 @@ module.exports.sendResetLink = async function (req, res) {
     const token = jwt.sign(payload, secret, { expiresIn: '15m' });
     const resetLink = `http://localhost:${env.port}/password/reset-password/${user.id}/${token}`;
     console.log(resetLink);
+    user.resetLink = resetLink;
+    forgetPasswordMailer.newResetPassword(user);
     req.flash(
         'success',
         'Email sent - reset password link expires in 15 minutes'
@@ -61,7 +63,6 @@ module.exports.resetpassword = async function (req, res) {
                 title: 'reset-password',
             });
         } catch (error) {
-            // todo flash error
             req.flash('error', 'Exipred/Invalid Token');
             return res.redirect('/password/forgot-password');
         }

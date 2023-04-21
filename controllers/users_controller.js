@@ -59,6 +59,32 @@ module.exports.createSession = function (req, res) {
     return res.redirect('/');
 };
 
+// flash middleware for password & confirm password matching check
+module.exports.flashmiddleware = async function (req, res, next) {
+    try {
+        let user = await User.findOne({ email: req.body.email });
+        if (!user) {
+            req.flash('error', 'email does not exist');
+            next();
+        }
+        if (user) {
+            await user.comparePassword(
+                req.body.password,
+                function (error, isMatch) {
+                    if (isMatch) {
+                    } else {
+                        req.flash('error', 'password does not match');
+                    }
+                }
+            );
+            next();
+        }
+        // req.flash('error', 'password & confirm password mismatch');
+    } catch (err) {
+        console.log(err);
+    }
+};
+
 // log out the user
 module.exports.destroySession = function (req, res) {
     req.logout(function (err) {
