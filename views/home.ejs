@@ -1,6 +1,23 @@
-<div><% if (locals.user) {%>
-    <a href="/users/sign-out">Sign-Out</a>
-    <br>
-    <a href="/password/reset-signin-password">Reset-Password</a>
-    <% } %>
+<link rel="stylesheet" href="/css/home.css" />
+
+<div class="home-contationer">
+    <div class="text-Button-conatiner">
+        <% if (locals.user) {%>
+        <div class="text-Button-inhome button-home-signout">
+
+            <a href="/users/sign-out">
+                Sign-Out
+            </a>
+
+        </div>
+        <br>
+        <div class="text-Button-inhome button-home-reset">
+
+            <a href="/password/reset-signin-password">
+                Reset-Password
+            </a>
+
+        </div>
+        <% } %>
+    </div>
 </div>
