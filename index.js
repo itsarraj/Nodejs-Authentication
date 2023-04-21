@@ -44,7 +44,9 @@ app.use(
         },
         store: MongoStore.create(
             {
-                mongoUrl: `mongodb://127.0.0.1/${env.db}`,
+                // mongoUrl: `mongodb://127.0.0.1/${env.db}`,
+                mongoUrl: process.env.MONGOURI,
+
                 mongooseConnection: db,
                 autoRemove: 'disabled',
             },
