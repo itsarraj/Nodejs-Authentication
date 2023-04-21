@@ -4,7 +4,7 @@
     "description": "complete authentication system for creating new application",
     "main": "index.js",
     "scripts": {
-        "start": "pm2 start index.js",
+        "start": "pm2 start index.js --no-daemon",
         "deployed_start": "pm2 start index.js --no-daemon"
     },
     "repository": {
