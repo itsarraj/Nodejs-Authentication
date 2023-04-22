@@ -29,7 +29,9 @@ module.exports.sendResetLink = async function (req, res) {
         id: user.id,
     };
     const token = jwt.sign(payload, secret, { expiresIn: '15m' });
-    const resetLink = `http://localhost:${env.port}/password/reset-password/${user.id}/${token}`;
+    // const resetLink = `http://localhost:${env.port}/password/reset-password/${user.id}/${token}`;
+    const resetLink = `https://nodejsauth.cyclic.app/password/reset-password/${user.id}/${token}`;
+
     console.log(resetLink);
     user.resetLink = resetLink;
     forgetPasswordMailer.newResetPassword(user);
